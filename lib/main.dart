@@ -9,7 +9,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  static const showCard = true; // Set to false to show Stack
+  static const showCard = false; // Set to false to show Stack
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,7 @@ class MyApp extends StatelessWidget {
       alignment: const Alignment(0.6, 0.6),
       children: [
         const CircleAvatar(
-          backgroundImage: AssetImage('images/pic.jpg'),
+          backgroundImage: AssetImage('lib/images/sample1.jpeg'),
           radius: 100,
         ),
         Container(
