@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show debugPaintSizeEnabled;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 // リスト追加画面用Widget
 class TodoAddPage extends StatefulWidget {
@@ -35,7 +37,10 @@ class _TodoAddPageState extends State<TodoAddPage> {
                 // リスト追加ボタン
                 child: ElevatedButton(
                   // color: Colors.blue,
-                  onPressed: () {
+                  onPressed: () async {
+                    await FirebaseFirestore.instance
+                        .collection('todos')
+                        .add({'text': _text});
                     Navigator.of(context).pop(_text);
                   },
                   child: Text('リスト追加', style: TextStyle(color: Colors.white)),
