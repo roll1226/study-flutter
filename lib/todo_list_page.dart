@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'todo_add_page.dart';
 
 class TodoListPage extends StatefulWidget {
@@ -15,12 +18,7 @@ class _TodoListPageState extends State<TodoListPage> {
       appBar: AppBar(
         title: Text('リスト一覧'),
       ),
-      body: ListView.builder(
-        itemCount: todoList.length,
-        itemBuilder: (context, index) {
-          return _buildCard(todoList[index]);
-        },
-      ),
+      body: _buildList(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // "push"で新規画面に遷移
@@ -46,6 +44,34 @@ class _TodoListPageState extends State<TodoListPage> {
   Card _buildCard(String title) {
     return Card(
       child: ListTile(title: Text(title)),
+    );
+  }
+
+  Widget _buildList(BuildContext context) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collection('todos').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        //データを取得できなかった場合の返り値を指定
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('取得できませんでした'),
+          );
+        }
+        //取得中の返り値を指定
+        if (!snapshot.hasData) {
+          return Center(
+            child: Text("Loading"),
+          );
+        }
+        //データを取得できた場合の返り値を指定
+        return ListView(
+          children: snapshot.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> message =
+                document.data()! as Map<String, dynamic>;
+            return _buildCard(message['text']);
+          }).toList(),
+        );
+      },
     );
   }
 }
