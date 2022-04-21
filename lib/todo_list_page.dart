@@ -57,7 +57,7 @@ class _TodoListPageState extends State<TodoListPage> {
             child: Text('取得できませんでした'),
           );
         }
-        //取得中の返り値を指定
+        //取得中の返り値を指定Text(message['text'])
         if (!snapshot.hasData) {
           return Center(
             child: Text("Loading"),
@@ -66,9 +66,39 @@ class _TodoListPageState extends State<TodoListPage> {
         //データを取得できた場合の返り値を指定
         return ListView(
           children: snapshot.data!.docs.map((DocumentSnapshot document) {
-            Map<String, dynamic> message =
+            Map<String, dynamic> todo =
                 document.data()! as Map<String, dynamic>;
-            return _buildCard(message['text']);
+            Key docId = Key(document.id);
+            return Dismissible(
+                key: docId,
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: AlignmentDirectional.centerEnd,
+                  color: Colors.red,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                onDismissed: (direction) async {
+                  FirebaseFirestore.instance
+                      .collection('todos')
+                      .doc(document.id)
+                      .delete()
+                      .then((value) =>
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            backgroundColor: Colors.red,
+                            content: Row(children: [
+                              Icon(Icons.delete, color: Colors.white),
+                              SizedBox(width: 20),
+                              Expanded(child: Text('削除したでぇ'))
+                            ]),
+                          )));
+                },
+                child: _buildCard(todo['text']));
           }).toList(),
         );
       },
